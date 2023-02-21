@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-l8sqdk6+l1v=-q!#csfu*@shm&4ao%eb5^14z=8#*0f0cm8gov
 DEBUG = True
 CORS_ALLOW_ALL_ORIGINS = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["192.168.100.101", "127.0.0.1"]
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL = "/rooms/"
 LOGIN_URL = "/login/"
@@ -35,6 +35,7 @@ LOGIN_URL = "/login/"
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -45,6 +46,8 @@ INSTALLED_APPS = [
     "core",
     "channels",
     "room",
+
+
 
     "corsheaders",
 ]
@@ -137,5 +140,5 @@ STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
-
+import os
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

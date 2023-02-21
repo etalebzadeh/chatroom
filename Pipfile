@@ -8,6 +8,7 @@ django = "*"
 channels = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 django-cors-headers = "*"
+daphne = "*"
 
 [dev-packages]
 

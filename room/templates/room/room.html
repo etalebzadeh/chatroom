@@ -1,19 +1,26 @@
 {% extends 'core/base.html' %}
+{% load static %}
+
+{% block css_files %}
+<link rel="stylesheet" href="{% static 'room/styles.css' %}?v=1">
+{%endblock%}
+
 
 {%block title%} {{room.name}}|{%endblock%}
 
+
 {%block content%}
+
+
 <div class="p-10 lg:p-20 text-center">
-    <h1 class="text-3xl lg:text-6xl text-white">{{room.name}}</h1>
+    <h1 class="text-3xl lg:text-6xl text-white">{{room.name}} {{user.username}}</h1>
 </div>
 
 <div class="lg:w-2/4 mx-4 lg:mx-auto p-4 bg-white rounded-xl">
     <div class="chat-messages space-y-3" id="chat-messages">
         {%for message in messages%}
-        <div class="p-4 bg-gray-200 rounded-xl">
-            <p class="font-semibold"> {{message.user.username}}</p>
-            <p>{{message.content}}</p>
-        </div>
+        {% include 'room/message.html' %}
+        <!-- <a href="{% url 'delete_message' message.id %}">Delete </a> -->
         {%endfor%}
     </div>
 </div>
@@ -31,6 +38,7 @@
 
 {%block scripts%}
 {{room.slug|json_script:"json-roomname" }}
+{{m|json_script:"json-ro]" }}
 {{request.user.username|json_script:"json-username"}}
 <script>
     const roomName = JSON.parse(document.getElementById("json-roomname").textContent)
@@ -42,14 +50,21 @@
         + roomName
         + "/"
     );
+
     chatSocket.onmessage = function (e) {
+        e.preventDefault()
+        console.log("OKKKK")
         console.log("onmessage")
         const data = JSON.parse(e.data);
-
         if (data.message) {
             let html = '<div class="p-4 bg-gray-200 rounded-xl">';
-            html += '<p class="font-semibold">' + data.username + '</p>';
-            html += '<p>' + data.message + '</p>' + '</div>'
+            html += '<p class="font-semibold blue">' + data.username + '</p>';
+            html += '<p class="font-semibold blue">' + data.message + '</p>';
+            html += '<form  class="de lete-form" action="/rooms/delete_message/' + data.message_id + '/" method="POST">';
+            html += '{% csrf_token %}';
+            html += '<button type="submit">Delete</button>';
+            html += '</form>';
+            html += '</div>';
             document.querySelector("#chat-messages").innerHTML += html
 
             scrollButtom()
@@ -60,6 +75,11 @@
     }
     chatSocket.onclose = function (e) {
         console.log("onclose")
+        if (e.code != 1000) {
+            setTimeout(function () {
+                location.reload();
+            }, 500);
+        }
     }
 
     //
@@ -70,7 +90,7 @@
         chatSocket.send(JSON.stringify({
             "message": message,
             "username": userName,
-            "room": roomName
+            "room": roomName,
         }));
         messageInputDom.value = "";
         return false;
@@ -81,5 +101,30 @@
         obj.scrollTop = obj.scrollHeight
     }
     scrollButtom()
+
+    document.querySelectorAll('.delete-form').forEach(function (form) {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            console.log("dc")
+            const form = e.target;
+            const formData = new FormData(form);
+            const messageDiv = form.closest('.p-4');
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            })
+                .then(function (response) {
+                    if (response.ok) {
+                        messageDiv.remove();
+                    }
+                });
+        });
+
+
+    });
+
 </script>
 {%endblock%}

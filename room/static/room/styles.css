@@ -1,0 +1,9 @@
+.chat-messages {
+    height: 400px;
+    overflow-y: auto;
+}
+
+.blue {
+    color: blue !important;
+    text-align: right;
+}

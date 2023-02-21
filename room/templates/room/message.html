@@ -1,0 +1,17 @@
+<!-- message.html -->
+{% load static %}
+<link rel="stylesheet" href="{% static 'room/styles.css' %}?v=1">
+
+<div class="p-4 bg-gray-200 rounded-xl">
+    {% if message.user == user %}
+    <p class="font-semibold blue">{{ message.user.username }}</p>
+    <p class="font-semibold blue">{{ message.content }}</p>
+    <form class="delete-form" action="{% url 'delete_message' message.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Delete</button>
+    </form>
+    {% else %}
+    <p class="font-semibold">{{ message.user.username }}</p>
+    <p class="font-semibold">{{ message.content }}</p>
+    {% endif %}
+</div>
